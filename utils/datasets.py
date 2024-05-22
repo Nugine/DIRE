@@ -34,7 +34,7 @@ def get_transform(cfg: CONFIGCLASS, visualizing=False):
     else:
         rz_func = identity_transform
 
-    if cfg.isTrain:
+    if cfg.isTrain or visualizing:
         crop_func = transforms.RandomCrop(cfg.cropSize)
     else:
         crop_func = transforms.CenterCrop(cfg.cropSize) if cfg.aug_crop else identity_transform

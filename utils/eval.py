@@ -76,7 +76,7 @@ def validate(model: nn.Module, cfg: CONFIGCLASS):
 
 
 def vis_gradcam(model: nn.Module, cfg: CONFIGCLASS):
-    from pytorch_grad_cam import GradCAM
+    from pytorch_grad_cam import GradCAM, GradCAMPlusPlus
     from pytorch_grad_cam.utils.image import show_cam_on_image
     import cv2
     from PIL import Image
@@ -92,13 +92,16 @@ def vis_gradcam(model: nn.Module, cfg: CONFIGCLASS):
     y_true, y_pred = validate["y_true"], validate["y_pred"]
 
     indices = [
-        idx for idx in range(len(y_true)) if y_true[idx] == 1 and y_pred[idx] < 0.5
+        idx for idx in range(len(y_true)) if y_true[idx] == 1 and y_pred[idx] > 0.95
     ]
     input_tensor_idx = random.choice(indices)
     input_tensor = data_loader.dataset[input_tensor_idx][0].unsqueeze(0).to(device)
 
+    print(f"pred = {y_pred[input_tensor_idx]:.5f}, true = {y_true[input_tensor_idx]}")
+
     target_layers = [model.layer4[-1]]
-    cam = GradCAM(model=model, target_layers=target_layers)
+    # cam = GradCAM(model=model, target_layers=target_layers)
+    cam = GradCAMPlusPlus(model=model, target_layers=target_layers)
     grayscale_cam = cam(input_tensor=input_tensor)
     grayscale_cam = grayscale_cam[0, :]
 
