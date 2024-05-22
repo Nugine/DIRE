@@ -91,7 +91,10 @@ def get_network(arch: str, isTrain=False, continue_train=False, init_gain=0.02, 
                 model: ResNet = resnet(num_classes=1)
             else:
                 model: ResNet = resnet(pretrained=pretrained)
-                model.fc = nn.Linear(2048, 1)
+                if arch in ["resnet18", "resnet34"]:
+                    model.fc = nn.Linear(512, 1)
+                else:
+                    model.fc = nn.Linear(2048, 1)
                 nn.init.normal_(model.fc.weight.data, 0.0, init_gain)
         else:
             model: ResNet = resnet(num_classes=1)
