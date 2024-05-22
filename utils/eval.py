@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
+from sklearn.metrics import confusion_matrix
 
 from utils.config import CONFIGCLASS
 from utils.utils import to_cuda
@@ -57,10 +58,12 @@ def validate(model: nn.Module, cfg: CONFIGCLASS):
     f_acc = accuracy_score(y_true[y_true == 1], y_pred[y_true == 1] > 0.5)
     acc = accuracy_score(y_true, y_pred > 0.5)
     ap = average_precision_score(y_true, y_pred)
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred > 0.5).ravel()
     results = {
         "ACC": acc,
         "AP": ap,
         "R_ACC": r_acc,
         "F_ACC": f_acc,
+        "Confusion_Matrix": {"TN": tn, "FP": fp, "FN": fn, "TP": tp},
     }
     return results
