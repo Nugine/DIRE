@@ -26,7 +26,7 @@ def dataset_folder(root: str, cfg: CONFIGCLASS):
     raise ValueError("cfg.mode needs to be binary or filename.")
 
 
-def binary_dataset(root: str, cfg: CONFIGCLASS):
+def get_transform(cfg: CONFIGCLASS, visualizing=False):
     identity_transform = transforms.Lambda(lambda img: img)
 
     if cfg.isTrain or cfg.aug_resize:
@@ -44,20 +44,37 @@ def binary_dataset(root: str, cfg: CONFIGCLASS):
     else:
         flip_func = identity_transform
 
-    return datasets.ImageFolder(
-        root,
-        transforms.Compose(
+    if cfg.aug_norm:
+        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) 
+    else:
+        normalize = identity_transform
+        
+    if not visualizing:
+        return transforms.Compose(
             [
                 rz_func,
                 transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)),
                 crop_func,
                 flip_func,
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-                if cfg.aug_norm
-                else identity_transform,
+                normalize
             ]
         )
+    else:
+        return transforms.Compose(
+            [
+                rz_func,
+                transforms.Lambda(lambda img: blur_jpg_augment(img, cfg)),
+                crop_func,
+                flip_func,
+                transforms.ToTensor(),
+            ]
+        )
+
+def binary_dataset(root: str, cfg: CONFIGCLASS):
+    return datasets.ImageFolder(
+        root,
+        get_transform(cfg)
     )
 
 
@@ -169,6 +186,8 @@ def create_dataloader(cfg: CONFIGCLASS):
     shuffle = not cfg.serial_batches if (cfg.isTrain and not cfg.class_bal) else False
     dataset = get_dataset(cfg)
     sampler = get_bal_sampler(dataset) if cfg.class_bal else None
+
+    print(f"Creating DataLoader: shuffle={shuffle}")
 
     return torch.utils.data.DataLoader(
         dataset,

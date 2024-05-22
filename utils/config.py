@@ -65,6 +65,8 @@ class DefaultConfigs(ABC):
     logs_path = ""
     ckpt_path = ""
 
+    gradcam: bool = False
+
     @property
     def exp_name(self):
         return self._exp_name

@@ -5,8 +5,9 @@ import os
 
 import torch
 
-from utils.eval import get_val_cfg, validate
+from utils.eval import get_val_cfg, validate, vis_gradcam
 from utils.utils import get_network
+
 
 cfg = get_val_cfg(cfg, split="test", copy=False)
 
@@ -25,20 +26,25 @@ for i, dataset in enumerate(cfg.datasets_test):
     model.cuda()
     model.eval()
 
-    test_results = validate(model, cfg)
-    print(f"{dataset}:")
-    for k, v in test_results.items():
-        if isinstance(v, float):
-            print(f"{k}: {v:.5f}")
-        else:
-            print(f"{k}: {v}")
-    print("*" * 50)
-    if i == 0:
-        rows.append(["TestSet"] + list(test_results.keys()))
-    rows.append([dataset] + list(test_results.values()))
+    if not cfg.gradcam:
+        test_results = validate(model, cfg)
+        print(f"{dataset}:")
+        for k, v in test_results.items():
+            if isinstance(v, float):
+                print(f"{k}: {v:.5f}")
+            else:
+                print(f"{k}: {v}")
+        print("*" * 50)
+        if i == 0:
+            rows.append(["TestSet"] + list(test_results.keys()))
+        rows.append([dataset] + list(test_results.values()))
+        
+    if cfg.gradcam:
+        vis_gradcam(model, cfg)
 
-results_dir = os.path.join(cfg.root_dir, "data", "results")
-os.makedirs(results_dir, exist_ok=True)
-with open(os.path.join(results_dir, f"{cfg.exp_name}-{model_name}.csv"), "w") as f:
-    csv_writer = csv.writer(f, delimiter=",")
-    csv_writer.writerows(rows)
+if not cfg.gradcam:
+    results_dir = os.path.join(cfg.root_dir, "data", "results")
+    os.makedirs(results_dir, exist_ok=True)
+    with open(os.path.join(results_dir, f"{cfg.exp_name}-{model_name}.csv"), "w") as f:
+        csv_writer = csv.writer(f, delimiter=",")
+        csv_writer.writerows(rows)
