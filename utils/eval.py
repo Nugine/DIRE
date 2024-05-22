@@ -64,6 +64,6 @@ def validate(model: nn.Module, cfg: CONFIGCLASS):
         "AP": ap,
         "R_ACC": r_acc,
         "F_ACC": f_acc,
-        "Confusion_Matrix": {"TN": tn, "FP": fp, "FN": fn, "TP": tp},
+        "ConfusionMatrix": {"TN": tn, "FP": fp, "FN": fn, "TP": tp},
     }
     return results

@@ -28,7 +28,10 @@ for i, dataset in enumerate(cfg.datasets_test):
     test_results = validate(model, cfg)
     print(f"{dataset}:")
     for k, v in test_results.items():
-        print(f"{k}: {v:.5f}")
+        if isinstance(v, float):
+            print(f"{k}: {v:.5f}")
+        else:
+            print(f"{k}: {v}")
     print("*" * 50)
     if i == 0:
         rows.append(["TestSet"] + list(test_results.keys()))
