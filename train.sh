@@ -2,7 +2,7 @@
 ### make sure that you have modified the EXP_NAME, DATASETS, DATASETS_TEST
 # eval "$(conda shell.bash hook)"
 # conda activate dire
-EXP_NAME="girls-new-resnet50"
+EXP_NAME="girls-new-resnet50-vf"
 DATASETS="girls-new"
 DATASETS_TEST="girls-new"
 python train.py --gpus 0 --exp_name $EXP_NAME datasets $DATASETS datasets_test $DATASETS_TEST arch resnet50 "$@"

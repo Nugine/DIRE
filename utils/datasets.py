@@ -40,7 +40,10 @@ def get_transform(cfg: CONFIGCLASS, visualizing=False):
         crop_func = transforms.CenterCrop(cfg.cropSize) if cfg.aug_crop else identity_transform
 
     if cfg.isTrain and cfg.aug_flip:
-        flip_func = transforms.RandomHorizontalFlip()
+        flip_func = transforms.Compose([
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ])
     else:
         flip_func = identity_transform
 
