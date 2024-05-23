@@ -92,7 +92,7 @@ def vis_gradcam(model: nn.Module, cfg: CONFIGCLASS):
     y_true, y_pred = validate["y_true"], validate["y_pred"]
 
     indices = [
-        idx for idx in range(len(y_true)) if y_true[idx] == 1 and y_pred[idx] > 0.95
+        idx for idx in range(len(y_true)) if y_true[idx] == 0 and y_pred[idx] < 0.05
     ]
     input_tensor_idx = random.choice(indices)
     input_tensor = data_loader.dataset[input_tensor_idx][0].unsqueeze(0).to(device)
